@@ -30,13 +30,16 @@ class TaskListFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(activity)
-        recyclerView.adapter = TaskListAdapter(taskList)
+        val adapter = TaskListAdapter()
+        recyclerView.adapter = adapter
+
+        adapter.submitList(taskList.toList())
 
         val addTaskBtn = view.findViewById<FloatingActionButton>(R.id.add_task_btn)
         addTaskBtn.setOnClickListener {
             val newTask = Task(id = UUID.randomUUID().toString(), title = "Task ${taskList.size + 1}")
             taskList.add(newTask)
-            recyclerView.adapter?.notifyItemInserted(taskList.size - 1)
+            adapter.submitList(taskList.toList())
         }
     }
 }
