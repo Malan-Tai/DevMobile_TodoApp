@@ -6,12 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.erwancastioni.todo.R
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.example.erwancastioni.todo.databinding.FragmentTaskListBinding
 import java.util.*
 
-class TaskListFragment: Fragment() {
+class TaskListFragment : Fragment() {
+
+    private lateinit var binding: FragmentTaskListBinding
 
     private val taskList = mutableListOf(
         Task(id = "id_1", title = "Task 1", description = "description 1"),
@@ -24,20 +24,20 @@ class TaskListFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_task_list, container, false)
+        binding = FragmentTaskListBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(activity)
+        binding.recyclerView.layoutManager = LinearLayoutManager(activity)
         val adapter = TaskListAdapter()
-        recyclerView.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         adapter.submitList(taskList.toList())
 
-        val addTaskBtn = view.findViewById<FloatingActionButton>(R.id.add_task_btn)
-        addTaskBtn.setOnClickListener {
-            val newTask = Task(id = UUID.randomUUID().toString(), title = "Task ${taskList.size + 1}")
+        binding.addTaskBtn.setOnClickListener {
+            val newTask =
+                Task(id = UUID.randomUUID().toString(), title = "Task ${taskList.size + 1}")
             taskList.add(newTask)
             adapter.submitList(taskList.toList())
         }

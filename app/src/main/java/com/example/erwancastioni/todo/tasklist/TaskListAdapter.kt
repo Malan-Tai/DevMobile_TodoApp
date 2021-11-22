@@ -2,13 +2,11 @@ package com.example.erwancastioni.todo.tasklist
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.erwancastioni.todo.R
+import com.example.erwancastioni.todo.databinding.ItemTaskBinding
 
 class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(DiffCallback()) {
 
@@ -23,19 +21,17 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(DiffCa
         }
     }
 
-    inner class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class TaskViewHolder(val binding: ItemTaskBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(task: Task) {
-            val titleView = itemView.findViewById<TextView>(R.id.task_title)
-            titleView.text = task.title
-
-            val descView = itemView.findViewById<TextView>(R.id.task_description)
-            descView.text = task.description
+            binding.taskTitle.text = task.title
+            binding.taskDescription.text = task.description
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false)
-        return TaskViewHolder(itemView)
+        //val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false)
+        val binding = ItemTaskBinding.inflate(LayoutInflater.from(parent.context))
+        return TaskViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
