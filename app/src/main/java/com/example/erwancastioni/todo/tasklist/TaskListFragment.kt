@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.erwancastioni.todo.databinding.FragmentTaskListBinding
 import com.example.erwancastioni.todo.form.FormActivity
-import java.util.*
 
 class TaskListFragment : Fragment() {
     private lateinit var binding: FragmentTaskListBinding
@@ -35,7 +34,7 @@ class TaskListFragment : Fragment() {
 
     lateinit var adapter: TaskListAdapter
 
-    val adapterListener = object : TaskListListener {
+    private val adapterListener = object : TaskListListener {
         override fun onClickDelete(task: Task) {
             taskList.remove(task)
             adapter.submitList(taskList.toList())
@@ -63,7 +62,21 @@ class TaskListFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+
+        var i = 0;
+        var savedTask = savedInstanceState?.getSerializable("task_$i") as? Task
+
+        if (savedTask != null) {
+            taskList.clear()
+        }
+
+        while (savedTask != null) {
+            taskList.add(savedTask)
+            i++
+            savedTask = savedInstanceState?.getSerializable("task_$i") as? Task
+        }
+
         binding = FragmentTaskListBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -78,6 +91,13 @@ class TaskListFragment : Fragment() {
         binding.addTaskBtn.setOnClickListener {
             val intent = Intent(activity, FormActivity::class.java)
             formLauncher.launch(intent)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        for ((i, task) in taskList.withIndex()) {
+            outState.putSerializable("task_$i", task)
         }
     }
 }
