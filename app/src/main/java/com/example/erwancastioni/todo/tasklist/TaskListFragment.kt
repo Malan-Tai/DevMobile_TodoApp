@@ -13,7 +13,6 @@ import com.example.erwancastioni.todo.form.FormActivity
 import java.util.*
 
 class TaskListFragment : Fragment() {
-
     private lateinit var binding: FragmentTaskListBinding
 
     private val taskList = mutableListOf(
@@ -21,6 +20,33 @@ class TaskListFragment : Fragment() {
         Task(id = "id_2", title = "Task 2"),
         Task(id = "id_3", title = "Task 3")
     )
+
+    val formLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val task = result.data?.getSerializableExtra("task") as? Task
+
+        val oldTask = taskList.firstOrNull { it.id == task?.id }
+        if (oldTask != null) taskList.remove(oldTask)
+
+        if (task != null) {
+            taskList.add(task)
+            adapter.submitList(taskList.toList())
+        }
+    }
+
+    lateinit var adapter: TaskListAdapter
+
+    val adapterListener = object : TaskListListener {
+        override fun onClickDelete(task: Task) {
+            taskList.remove(task)
+            adapter.submitList(taskList.toList())
+        }
+
+        override fun onClickEdit(task: Task) {
+            val intent = Intent(activity, FormActivity::class.java)
+            intent.putExtra("task", task)
+            formLauncher.launch(intent)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,35 +59,13 @@ class TaskListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
-        val adapter = TaskListAdapter()
+        adapter = TaskListAdapter(adapterListener)
         binding.recyclerView.adapter = adapter
 
         adapter.submitList(taskList.toList())
-        adapter.onClickDelete = { task ->
-            taskList.remove(task)
-            adapter.submitList(taskList.toList())
-        }
-
-        val formLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            val task = result.data?.getSerializableExtra("task") as? Task
-
-            val oldTask = taskList.firstOrNull { it.id == task?.id }
-            if (oldTask != null) taskList.remove(oldTask)
-
-            if (task != null) {
-                taskList.add(task)
-                adapter.submitList(taskList.toList())
-            }
-        }
 
         binding.addTaskBtn.setOnClickListener {
             val intent = Intent(activity, FormActivity::class.java)
-            formLauncher.launch(intent)
-        }
-
-        adapter.onClickEdit = { task ->
-            val intent = Intent(activity, FormActivity::class.java)
-            intent.putExtra("task", task)
             formLauncher.launch(intent)
         }
     }
