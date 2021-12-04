@@ -28,6 +28,7 @@ class TaskListAdapter(val listener: TaskListListener) : ListAdapter<Task, TaskLi
 
             binding.deleteTaskBtn.setOnClickListener { listener.onClickDelete(task) }
             binding.editTaskBtn.setOnClickListener { listener.onClickEdit(task) }
+            binding.shareTaskBtn.setOnClickListener { listener.onClickShare(task) }
         }
     }
 

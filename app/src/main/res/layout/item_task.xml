@@ -45,4 +45,14 @@
         app:srcCompat="@drawable/ic_baseline_delete_24"
         app:tint="@color/white"/>
 
+    <ImageButton
+        android:id="@+id/share_task_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:backgroundTint="@android:color/holo_blue_dark"
+        android:contentDescription="@string/delete_task"
+        app:srcCompat="@drawable/ic_baseline_share_24"
+        app:tint="@color/white" />
+
 </LinearLayout>
