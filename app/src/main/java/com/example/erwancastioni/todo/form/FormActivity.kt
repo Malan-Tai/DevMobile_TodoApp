@@ -18,8 +18,13 @@ class FormActivity : AppCompatActivity() {
         val title = findViewById<EditText>(R.id.editTextTaskTitle)
         val desc = findViewById<EditText>(R.id.editTextTaskDescription)
 
+        val task = intent.getSerializableExtra("task") as? Task
+
+        title.setText(task?.title)
+        desc.setText(task?.description)
+
         confirm.setOnClickListener {
-            val newTask = Task(id = UUID.randomUUID().toString(), title = title.text.toString(), description = desc.text.toString())
+            val newTask = Task(id = task?.id ?: UUID.randomUUID().toString(), title = title.text.toString(), description = desc.text.toString())
             intent.putExtra("task", newTask)
             setResult(RESULT_OK, intent)
             finish()

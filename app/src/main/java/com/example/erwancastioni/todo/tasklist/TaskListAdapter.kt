@@ -27,10 +27,12 @@ class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(DiffCa
             binding.taskDescription.text = task.description
 
             binding.deleteTaskBtn.setOnClickListener { onClickDelete(task) }
+            binding.editTaskBtn.setOnClickListener { onClickEdit(task) }
         }
     }
 
     var onClickDelete: (Task) -> Unit = {}
+    var onClickEdit: (Task) -> Unit = {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         //val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false)

@@ -44,6 +44,10 @@ class TaskListFragment : Fragment() {
 
         val formLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val task = result.data?.getSerializableExtra("task") as? Task
+
+            val oldTask = taskList.firstOrNull { it.id == task?.id }
+            if (oldTask != null) taskList.remove(oldTask)
+
             if (task != null) {
                 taskList.add(task)
                 adapter.submitList(taskList.toList())
@@ -52,6 +56,12 @@ class TaskListFragment : Fragment() {
 
         binding.addTaskBtn.setOnClickListener {
             val intent = Intent(activity, FormActivity::class.java)
+            formLauncher.launch(intent)
+        }
+
+        adapter.onClickEdit = { task ->
+            val intent = Intent(activity, FormActivity::class.java)
+            intent.putExtra("task", task)
             formLauncher.launch(intent)
         }
     }
