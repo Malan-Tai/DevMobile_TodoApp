@@ -34,6 +34,10 @@ class TaskListFragment : Fragment() {
         binding.recyclerView.adapter = adapter
 
         adapter.submitList(taskList.toList())
+        adapter.onClickDelete = { task ->
+            taskList.remove(task)
+            adapter.submitList(taskList.toList())
+        }
 
         binding.addTaskBtn.setOnClickListener {
             val newTask =
