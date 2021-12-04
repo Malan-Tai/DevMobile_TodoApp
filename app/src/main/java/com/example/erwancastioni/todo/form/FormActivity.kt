@@ -1,5 +1,6 @@
 package com.example.erwancastioni.todo.form
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -20,8 +21,14 @@ class FormActivity : AppCompatActivity() {
 
         val task = intent.getSerializableExtra("task") as? Task
 
-        title.setText(task?.title)
-        desc.setText(task?.description)
+        if (task != null) {
+            title.setText(task.title)
+            desc.setText(task.description)
+        }
+        else if (intent.action == Intent.ACTION_SEND && intent.type == "text/plain")
+        {
+            desc.setText(intent.getStringExtra(Intent.EXTRA_TEXT))
+        }
 
         confirm.setOnClickListener {
             val newTask = Task(id = task?.id ?: UUID.randomUUID().toString(), title = title.text.toString(), description = desc.text.toString())
