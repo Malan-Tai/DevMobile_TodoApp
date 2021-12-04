@@ -30,16 +30,7 @@ class TaskListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
-
-        val adapter: TaskListAdapter
-        val adapterListener = object : TaskListListener {
-            override fun onClickDelete(task: Task): List<Task> {
-                taskList.remove(task)
-                return taskList.toList()
-            }
-        }
-
-        adapter = TaskListAdapter(adapterListener)
+        val adapter = TaskListAdapter()
         binding.recyclerView.adapter = adapter
 
         adapter.submitList(taskList.toList())

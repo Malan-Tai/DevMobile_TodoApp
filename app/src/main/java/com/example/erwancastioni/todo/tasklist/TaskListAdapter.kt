@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.erwancastioni.todo.databinding.ItemTaskBinding
 
-class TaskListAdapter(val listener: TaskListListener) : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(DiffCallback()) {
+class TaskListAdapter : ListAdapter<Task, TaskListAdapter.TaskViewHolder>(DiffCallback()) {
 
     private class DiffCallback: DiffUtil.ItemCallback<Task>() {
         override fun areItemsTheSame(oldItem: Task, newItem: Task): Boolean {
@@ -23,8 +23,6 @@ class TaskListAdapter(val listener: TaskListListener) : ListAdapter<Task, TaskLi
 
     inner class TaskViewHolder(val binding: ItemTaskBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(task: Task) {
-            binding.root.setOnClickListener { submitList(listener.onClickDelete(task)) }
-
             binding.taskTitle.text = task.title
             binding.taskDescription.text = task.description
         }
