@@ -1,12 +1,15 @@
 package com.example.erwancastioni.todo.tasklist
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.erwancastioni.todo.databinding.FragmentTaskListBinding
+import com.example.erwancastioni.todo.form.FormActivity
 import java.util.*
 
 class TaskListFragment : Fragment() {
@@ -39,11 +42,17 @@ class TaskListFragment : Fragment() {
             adapter.submitList(taskList.toList())
         }
 
+        val formLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val task = result.data?.getSerializableExtra("task") as? Task
+            if (task != null) {
+                taskList.add(task)
+                adapter.submitList(taskList.toList())
+            }
+        }
+
         binding.addTaskBtn.setOnClickListener {
-            val newTask =
-                Task(id = UUID.randomUUID().toString(), title = "Task ${taskList.size + 1}")
-            taskList.add(newTask)
-            adapter.submitList(taskList.toList())
+            val intent = Intent(activity, FormActivity::class.java)
+            formLauncher.launch(intent)
         }
     }
 }

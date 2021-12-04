@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">ToDoErwanCastioni</string>
     <string name="delete_task">delete task</string>
+    <string name="confirm">Confirm</string>
+    <string name="task_title">Task Title</string>
+    <string name="task_description">Task Description</string>
 </resources>
