@@ -12,10 +12,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.erwancastioni.todo.databinding.FragmentTaskListBinding
 import com.example.erwancastioni.todo.form.FormActivity
 import com.example.erwancastioni.todo.network.Api
+import com.example.erwancastioni.todo.network.TasksRepository
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class TaskListFragment : Fragment() {
     private lateinit var binding: FragmentTaskListBinding
+
+    private val tasksRepository = TasksRepository()
 
     private val taskList = mutableListOf(
         Task(id = "id_1", title = "Task 1", description = "description 1"),
@@ -95,6 +99,13 @@ class TaskListFragment : Fragment() {
             val intent = Intent(activity, FormActivity::class.java)
             formLauncher.launch(intent)
         }
+
+        lifecycleScope.launch { // on lance une coroutine car `collect` est `suspend`
+            tasksRepository.taskList.collect { list ->
+                // on met à jour la liste dans l'adapteur
+                adapter.submitList(list)
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -113,5 +124,8 @@ class TaskListFragment : Fragment() {
             binding.userInfo.text = "${userInfo?.firstName} ${userInfo?.lastName}"
         }
 
+        lifecycleScope.launch {
+            tasksRepository.refresh() // on demande de rafraîchir les données sans attendre le retour directement
+        }
     }
 }
