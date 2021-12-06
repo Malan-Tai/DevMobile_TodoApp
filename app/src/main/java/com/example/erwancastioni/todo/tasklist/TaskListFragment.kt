@@ -7,9 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.erwancastioni.todo.databinding.FragmentTaskListBinding
 import com.example.erwancastioni.todo.form.FormActivity
+import com.example.erwancastioni.todo.network.Api
+import kotlinx.coroutines.launch
 
 class TaskListFragment : Fragment() {
     private lateinit var binding: FragmentTaskListBinding
@@ -64,7 +67,7 @@ class TaskListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        var i = 0;
+        var i = 0
         var savedTask = savedInstanceState?.getSerializable("task_$i") as? Task
 
         if (savedTask != null) {
@@ -99,5 +102,16 @@ class TaskListFragment : Fragment() {
         for ((i, task) in taskList.withIndex()) {
             outState.putSerializable("task_$i", task)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        lifecycleScope.launch {
+            val info = Api.userWebService.getInfo()
+            val userInfo = info.body()
+            binding.userInfo.text = "${userInfo?.firstName} ${userInfo?.lastName}"
+        }
+
     }
 }
