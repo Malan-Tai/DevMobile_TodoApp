@@ -15,5 +15,5 @@ interface TasksWebService {
     suspend fun update(@Body task: Task, @Path("id") id: String? = task.id): Response<Task>
 
     @DELETE ("tasks/{id}")
-    suspend fun delete(@Body task: Task, @Path("id") id: String? = task.id): Response<Unit>
+    suspend fun delete(@Path("id") id: String): Response<Unit>
 }
