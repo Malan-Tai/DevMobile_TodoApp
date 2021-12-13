@@ -17,6 +17,7 @@ import com.example.erwancastioni.todo.databinding.FragmentTaskListBinding
 import com.example.erwancastioni.todo.form.FormActivity
 import com.example.erwancastioni.todo.network.Api
 import com.example.erwancastioni.todo.network.TaskListViewModel
+import com.example.erwancastioni.todo.user.UserInfoActivity
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -71,19 +72,6 @@ class TaskListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        //var i = 0
-        //var savedTask = savedInstanceState?.getSerializable("task_$i") as? Task
-
-        //if (savedTask != null) {
-        //    taskList.clear()
-        //}
-
-        //while (savedTask != null) {
-        //    taskList.add(savedTask)
-        //    i++
-        //    savedTask = savedInstanceState?.getSerializable("task_$i") as? Task
-        //}
-
         binding = FragmentTaskListBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -105,6 +93,11 @@ class TaskListFragment : Fragment() {
         }
 
         viewModel.loadTasks()
+
+        binding.avatar.setOnClickListener {
+            val intent = Intent(activity, UserInfoActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     //override fun onSaveInstanceState(outState: Bundle) {
