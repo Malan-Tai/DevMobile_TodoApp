@@ -13,8 +13,13 @@ import android.widget.Button
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
+import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.example.erwancastioni.todo.R
+import com.example.erwancastioni.todo.network.Api
+import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 
 class UserInfoActivity : AppCompatActivity() {
@@ -78,9 +83,21 @@ class UserInfoActivity : AppCompatActivity() {
     private fun handleImage(imageUri: Uri) {
         val image = findViewById<ImageView>(R.id.avatar)
         image.load(imageUri)
+
+        lifecycleScope.launch {
+            Api.userWebService.updateAvatar(convert(imageUri))
+        }
     }
 
     private fun launchCamera() {
         cameraLauncher.launch(null)
+    }
+
+    private fun convert(uri: Uri): MultipartBody.Part {
+        return MultipartBody.Part.createFormData(
+            name = "avatar",
+            filename = "temp.jpeg",
+            body = this.contentResolver.openInputStream(uri)!!.readBytes().toRequestBody()
+        )
     }
 }

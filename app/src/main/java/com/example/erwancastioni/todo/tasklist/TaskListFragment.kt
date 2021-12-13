@@ -114,11 +114,14 @@ class TaskListFragment : Fragment() {
             val info = Api.userWebService.getInfo()
             val userInfo = info.body()
             binding.userInfo.text = "${userInfo?.firstName} ${userInfo?.lastName}"
-        }
 
-        binding.avatar.load("https://goo.gl/gEgYUd") {
-            placeholder(R.drawable.ic_launcher_foreground)
-            transformations(CircleCropTransformation())
+            if (userInfo?.avatar != null) {
+                binding.avatar.load(userInfo.avatar) {
+                    placeholder(R.drawable.ic_launcher_foreground)
+                    error(R.drawable.ic_launcher_foreground)
+                    transformations(CircleCropTransformation())
+                }
+            }
         }
     }
 }
