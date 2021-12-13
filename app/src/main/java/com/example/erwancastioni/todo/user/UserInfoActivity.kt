@@ -4,25 +4,32 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.example.erwancastioni.todo.R
 import com.example.erwancastioni.todo.network.Api
+import com.google.android.material.snackbar.Snackbar
+import com.google.modernstorage.mediastore.FileType
+import com.google.modernstorage.mediastore.Internal
+import com.google.modernstorage.mediastore.MediaStoreRepository
+import com.google.modernstorage.mediastore.SharedPrimary
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.File
+import java.util.*
 
 class UserInfoActivity : AppCompatActivity() {
+
+    val mediaStore by lazy { MediaStoreRepository(this) }
+    private lateinit var photoUri: Uri
 
     private val cameraPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { accepted ->
@@ -31,13 +38,11 @@ class UserInfoActivity : AppCompatActivity() {
         }
 
     // register
-    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-        val tmpFile = File.createTempFile("avatar", "jpeg")
-        tmpFile.outputStream().use {
-            bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, it)
+    private val cameraLauncher =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { accepted ->
+            if (accepted) handleImage()
+            else Snackbar.make(findViewById(R.id.takePictureButton), "Échec!", Snackbar.LENGTH_LONG)
         }
-        handleImage(tmpFile.toUri())
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +51,17 @@ class UserInfoActivity : AppCompatActivity() {
         val takePictureBtn = findViewById<Button>(R.id.takePictureButton)
         takePictureBtn.setOnClickListener {
             launchCameraWithPermission()
+        }
+
+        lifecycleScope.launchWhenStarted {
+            photoUri = mediaStore.createMediaUri(
+                filename = "new-picture-from-todo-${UUID.randomUUID()}.jpg",
+                type = FileType.IMAGE,
+                location = SharedPrimary
+            ).getOrElse { reason ->
+                Log.e("Malan", "Creating Media URI failed: $reason")
+                throw Exception()
+            }
         }
     }
 
@@ -80,17 +96,17 @@ class UserInfoActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun handleImage(imageUri: Uri) {
+    private fun handleImage() {
         val image = findViewById<ImageView>(R.id.avatar)
-        image.load(imageUri)
+        image.load(photoUri)
 
         lifecycleScope.launch {
-            Api.userWebService.updateAvatar(convert(imageUri))
+            Api.userWebService.updateAvatar(convert(photoUri))
         }
     }
 
     private fun launchCamera() {
-        cameraLauncher.launch(null)
+        cameraLauncher.launch(photoUri)
     }
 
     private fun convert(uri: Uri): MultipartBody.Part {
