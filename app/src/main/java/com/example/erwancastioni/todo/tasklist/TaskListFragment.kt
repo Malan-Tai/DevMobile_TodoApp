@@ -10,6 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import coil.load
+import coil.transform.CircleCropTransformation
+import com.example.erwancastioni.todo.R
 import com.example.erwancastioni.todo.databinding.FragmentTaskListBinding
 import com.example.erwancastioni.todo.form.FormActivity
 import com.example.erwancastioni.todo.network.Api
@@ -118,6 +121,11 @@ class TaskListFragment : Fragment() {
             val info = Api.userWebService.getInfo()
             val userInfo = info.body()
             binding.userInfo.text = "${userInfo?.firstName} ${userInfo?.lastName}"
+        }
+
+        binding.avatar.load("https://goo.gl/gEgYUd") {
+            placeholder(R.drawable.ic_launcher_foreground)
+            transformations(CircleCropTransformation())
         }
     }
 }
