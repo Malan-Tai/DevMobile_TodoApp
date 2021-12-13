@@ -18,18 +18,22 @@ import com.example.erwancastioni.todo.R
 import com.example.erwancastioni.todo.network.Api
 import com.google.android.material.snackbar.Snackbar
 import com.google.modernstorage.mediastore.FileType
-import com.google.modernstorage.mediastore.Internal
 import com.google.modernstorage.mediastore.MediaStoreRepository
 import com.google.modernstorage.mediastore.SharedPrimary
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.net.URI
 import java.util.*
 
 class UserInfoActivity : AppCompatActivity() {
 
     val mediaStore by lazy { MediaStoreRepository(this) }
     private lateinit var photoUri: Uri
+
+    private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) handleImage(uri)
+    }
 
     private val cameraPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { accepted ->
@@ -40,7 +44,7 @@ class UserInfoActivity : AppCompatActivity() {
     // register
     private val cameraLauncher =
         registerForActivityResult(ActivityResultContracts.TakePicture()) { accepted ->
-            if (accepted) handleImage()
+            if (accepted) handleImage(photoUri)
             else Snackbar.make(findViewById(R.id.takePictureButton), "Échec!", Snackbar.LENGTH_LONG)
         }
 
@@ -51,6 +55,11 @@ class UserInfoActivity : AppCompatActivity() {
         val takePictureBtn = findViewById<Button>(R.id.takePictureButton)
         takePictureBtn.setOnClickListener {
             launchCameraWithPermission()
+        }
+
+        val uploadImageBtn = findViewById<Button>(R.id.uploadImageButton)
+        uploadImageBtn.setOnClickListener {
+            galleryLauncher.launch("image/*")
         }
 
         lifecycleScope.launchWhenStarted {
@@ -96,12 +105,12 @@ class UserInfoActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun handleImage() {
+    private fun handleImage(imageUri: Uri) {
         val image = findViewById<ImageView>(R.id.avatar)
-        image.load(photoUri)
+        image.load(imageUri)
 
         lifecycleScope.launch {
-            Api.userWebService.updateAvatar(convert(photoUri))
+            Api.userWebService.updateAvatar(convert(imageUri))
         }
     }
 
@@ -115,5 +124,10 @@ class UserInfoActivity : AppCompatActivity() {
             filename = "temp.jpeg",
             body = this.contentResolver.openInputStream(uri)!!.readBytes().toRequestBody()
         )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        contentResolver.delete(photoUri, null, null)
     }
 }
