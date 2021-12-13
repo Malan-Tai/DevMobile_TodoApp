@@ -12,24 +12,27 @@ import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.example.erwancastioni.todo.R
 import com.example.erwancastioni.todo.network.Api
+import com.example.erwancastioni.todo.network.TaskListViewModel
+import com.example.erwancastioni.todo.network.UserInfoViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.google.modernstorage.mediastore.FileType
 import com.google.modernstorage.mediastore.MediaStoreRepository
 import com.google.modernstorage.mediastore.SharedPrimary
 import kotlinx.coroutines.launch
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.net.URI
 import java.util.*
 
 class UserInfoActivity : AppCompatActivity() {
 
     val mediaStore by lazy { MediaStoreRepository(this) }
     private lateinit var photoUri: Uri
+
+    private val viewModel: UserInfoViewModel by viewModels()
 
     private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) handleImage(uri)
@@ -110,20 +113,12 @@ class UserInfoActivity : AppCompatActivity() {
         image.load(imageUri)
 
         lifecycleScope.launch {
-            Api.userWebService.updateAvatar(convert(imageUri))
+            viewModel.editAvatar(contentResolver, imageUri)
         }
     }
 
     private fun launchCamera() {
         cameraLauncher.launch(photoUri)
-    }
-
-    private fun convert(uri: Uri): MultipartBody.Part {
-        return MultipartBody.Part.createFormData(
-            name = "avatar",
-            filename = "temp.jpeg",
-            body = this.contentResolver.openInputStream(uri)!!.readBytes().toRequestBody()
-        )
     }
 
     override fun onDestroy() {
