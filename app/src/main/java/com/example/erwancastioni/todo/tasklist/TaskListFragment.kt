@@ -2,19 +2,23 @@ package com.example.erwancastioni.todo.tasklist
 
 import android.content.Intent
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import coil.transform.CircleCropTransformation
 import com.example.erwancastioni.todo.R
 import com.example.erwancastioni.todo.databinding.FragmentTaskListBinding
 import com.example.erwancastioni.todo.form.FormActivity
+import com.example.erwancastioni.todo.network.Api
 import com.example.erwancastioni.todo.network.TaskListViewModel
 import com.example.erwancastioni.todo.network.UserInfoViewModel
 import com.example.erwancastioni.todo.user.UserInfoActivity
@@ -71,7 +75,12 @@ class TaskListFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
+
+        if (PreferenceManager.getDefaultSharedPreferences(context).getString(Api.SHARED_PREF_TOKEN_KEY, "") == "") {
+            findNavController().navigate(R.id.action_taskListFragment_to_authenticationFragment)
+            return null
+        }
 
         binding = FragmentTaskListBinding.inflate(inflater, container, false)
         return binding.root
@@ -110,6 +119,14 @@ class TaskListFragment : Fragment() {
         binding.avatar.setOnClickListener {
             val intent = Intent(activity, UserInfoActivity::class.java)
             startActivity(intent)
+        }
+
+        binding.disconnect.setOnClickListener {
+            PreferenceManager.getDefaultSharedPreferences(context).edit {
+                putString(Api.SHARED_PREF_TOKEN_KEY, "")
+            }
+
+            findNavController().navigate(R.id.action_taskListFragment_to_authenticationFragment)
         }
 
         taskListViewModel.loadTasks()
