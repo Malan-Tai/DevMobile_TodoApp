@@ -21,10 +21,9 @@ object Api {
 
     // client HTTP
     private val okHttpClient by lazy {
-        val token = PreferenceManager.getDefaultSharedPreferences(appContext).getString(SHARED_PREF_TOKEN_KEY, "")
-
         OkHttpClient.Builder()
             .addInterceptor { chain ->
+                val token = PreferenceManager.getDefaultSharedPreferences(appContext).getString(SHARED_PREF_TOKEN_KEY, "")
                 // intercepteur qui ajoute le `header` d'authentification avec votre token:
                 val newRequest = chain.request().newBuilder()
                     .addHeader("Authorization", "Bearer $token")
