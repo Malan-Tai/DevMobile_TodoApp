@@ -21,10 +21,22 @@
         android:id="@+id/logInFragment"
         android:name="com.example.erwancastioni.todo.authentication.LogInFragment"
         android:label="fragment_log_in"
-        tools:layout="@layout/fragment_log_in" />
+        tools:layout="@layout/fragment_log_in" >
+        <action
+            android:id="@+id/action_logInFragment_to_taskListFragment"
+            app:destination="@id/taskListFragment" />
+    </fragment>
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.example.erwancastioni.todo.authentication.SignUpFragment"
         android:label="fragment_sign_up"
-        tools:layout="@layout/fragment_sign_up" />
+        tools:layout="@layout/fragment_sign_up" >
+        <action
+            android:id="@+id/action_signUpFragment_to_taskListFragment"
+            app:destination="@id/taskListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/taskListFragment"
+        android:name="com.example.erwancastioni.todo.tasklist.TaskListFragment"
+        android:label="TaskListFragment" />
 </navigation>
