@@ -6,7 +6,6 @@ import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -17,11 +16,11 @@ import coil.load
 import coil.transform.CircleCropTransformation
 import com.example.erwancastioni.todo.R
 import com.example.erwancastioni.todo.databinding.FragmentTaskListBinding
-import com.example.erwancastioni.todo.form.FormActivity
+import com.example.erwancastioni.todo.getNavigationResultLiveData
 import com.example.erwancastioni.todo.network.Api
 import com.example.erwancastioni.todo.network.TaskListViewModel
 import com.example.erwancastioni.todo.network.UserInfoViewModel
-import com.example.erwancastioni.todo.user.UserInfoActivity
+import com.example.erwancastioni.todo.setNavigationResultToNext
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -31,21 +30,6 @@ class TaskListFragment : Fragment() {
     private val taskListViewModel: TaskListViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by viewModels()
 
-    val formLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val task = result.data?.getSerializableExtra("task") as? Task
-
-        val oldTask = taskListViewModel.taskList.value.firstOrNull { it.id == task?.id }
-
-        if (task != null) {
-            if (oldTask != null) {
-                taskListViewModel.editTask(task)
-            }
-            else {
-                taskListViewModel.addTask(task)
-            }
-        }
-    }
-
     private lateinit var adapter: TaskListAdapter
 
     private val adapterListener = object : TaskListListener {
@@ -54,9 +38,8 @@ class TaskListFragment : Fragment() {
         }
 
         override fun onClickEdit(task: Task) {
-            val intent = Intent(activity, FormActivity::class.java)
-            intent.putExtra("task", task)
-            formLauncher.launch(intent)
+            setNavigationResultToNext<Task?>(task, "taskToModify")
+            findNavController().navigate(R.id.action_taskListFragment_to_formFragment)
         }
 
         override fun onClickShare(task: Task) {
@@ -112,13 +95,12 @@ class TaskListFragment : Fragment() {
         }
 
         binding.addTaskBtn.setOnClickListener {
-            val intent = Intent(activity, FormActivity::class.java)
-            formLauncher.launch(intent)
+            setNavigationResultToNext<Task?>(null, "taskToModifiy")
+            findNavController().navigate(R.id.action_taskListFragment_to_formFragment)
         }
 
         binding.avatar.setOnClickListener {
-            val intent = Intent(activity, UserInfoActivity::class.java)
-            startActivity(intent)
+            findNavController().navigate(R.id.action_taskListFragment_to_userInfoFragment)
         }
 
         binding.disconnect.setOnClickListener {
@@ -127,6 +109,21 @@ class TaskListFragment : Fragment() {
             }
 
             findNavController().navigate(R.id.action_taskListFragment_to_authenticationFragment)
+        }
+
+        getNavigationResultLiveData<Task?>("taskToAdd")?.observe(viewLifecycleOwner) { task ->
+            val oldTask = taskListViewModel.taskList.value.firstOrNull { it.id == task?.id }
+
+            if (task != null) {
+                if (oldTask != null) {
+                    taskListViewModel.editTask(task)
+                }
+                else {
+                    taskListViewModel.addTask(task)
+                }
+
+                setNavigationResultToNext(null, "taskToAdd")
+            }
         }
 
         taskListViewModel.loadTasks()

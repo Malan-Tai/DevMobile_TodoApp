@@ -13,20 +13,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ToDoErwanCastioni">
-        <activity
-            android:name=".user.UserInfoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".form.FormActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
+<!--        <activity-->
+<!--            android:name=".form.FormFragment"-->
+<!--            android:exported="true">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.SEND" />-->
 
-                <category android:name="android.intent.category.DEFAULT" />
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
 
-                <data android:mimeType="text/*" />
-            </intent-filter>
-        </activity>
+<!--                <data android:mimeType="text/*" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
         <activity
             android:name=".MainActivity"
             android:exported="true">

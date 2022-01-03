@@ -5,8 +5,8 @@
     <string name="task_title">Task Title</string>
     <string name="task_description">Task Description</string>
     <string name="edit_task">Edit task</string>
-    <string name="choisir_une_image">Choisir une Image</string>
-    <string name="prendre_une_photo">Prendre une photo</string>
+    <string name="choisir_une_image">Choose an image</string>
+    <string name="prendre_une_photo">Take a picture</string>
     <string name="sign_up">Sign Up</string>
     <string name="log_in">Log In</string>
     <string name="email_address">E-mail address</string>
@@ -15,4 +15,5 @@
     <string name="last_name">Last Name</string>
     <string name="confirm_password">Confirm password</string>
     <string name="disconnect">Quit</string>
+    <string name="ok">OK</string>
 </resources>

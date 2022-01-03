@@ -1,40 +1,51 @@
 package com.example.erwancastioni.todo.form
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import com.example.erwancastioni.todo.R
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.erwancastioni.todo.databinding.FragmentFormBinding
+import com.example.erwancastioni.todo.getNavigationResult
+import com.example.erwancastioni.todo.setNavigationResultToPrev
 import com.example.erwancastioni.todo.tasklist.Task
 import java.util.*
 
-class FormActivity : AppCompatActivity() {
+class FormFragment : Fragment() {
+    private lateinit var binding: FragmentFormBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_form)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentFormBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        val confirm = findViewById<Button>(R.id.confirm_button)
-        val title = findViewById<EditText>(R.id.editTextTaskTitle)
-        val desc = findViewById<EditText>(R.id.editTextTaskDescription)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        val task = intent.getSerializableExtra("task") as? Task
+        val task = getNavigationResult<Task?>("taskToModify")
 
         if (task != null) {
-            title.setText(task.title)
-            desc.setText(task.description)
+            binding.editTextTaskTitle.setText(task.title)
+            binding.editTextTaskDescription.setText(task.description)
         }
-        else if (intent.action == Intent.ACTION_SEND && intent.type == "text/plain")
-        {
-            desc.setText(intent.getStringExtra(Intent.EXTRA_TEXT))
-        }
+//        else if (intent.action == Intent.ACTION_SEND && intent.type == "text/plain")
+//        {
+//            binding.editTextTaskDescription.setText(intent.getStringExtra(Intent.EXTRA_TEXT))
+//        }
 
-        confirm.setOnClickListener {
-            val newTask = Task(id = task?.id ?: UUID.randomUUID().toString(), title = title.text.toString(), description = desc.text.toString())
-            intent.putExtra("task", newTask)
-            setResult(RESULT_OK, intent)
-            finish()
+        binding.confirmButton.setOnClickListener {
+            val newTask = Task(id = task?.id ?: UUID.randomUUID().toString(), title = binding.editTextTaskTitle.text.toString(), description = binding.editTextTaskDescription.text.toString())
+//            intent.putExtra("task", newTask)
+//            setResult(RESULT_OK, intent)
+//            finish()
+            setNavigationResultToPrev<Task>(newTask, "taskToAdd")
+            findNavController().popBackStack()
         }
     }
 }

@@ -5,20 +5,19 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.widget.Button
-import android.widget.ImageView
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
+import androidx.core.content.PermissionChecker.checkSelfPermission
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.erwancastioni.todo.R
-import com.example.erwancastioni.todo.network.Api
-import com.example.erwancastioni.todo.network.TaskListViewModel
+import com.example.erwancastioni.todo.databinding.FragmentUserInfoBinding
 import com.example.erwancastioni.todo.network.UserInfoViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.google.modernstorage.mediastore.FileType
@@ -27,9 +26,10 @@ import com.google.modernstorage.mediastore.SharedPrimary
 import kotlinx.coroutines.launch
 import java.util.*
 
-class UserInfoActivity : AppCompatActivity() {
+class UserInfoFragment : Fragment() {
+    private lateinit var binding: FragmentUserInfoBinding
 
-    val mediaStore by lazy { MediaStoreRepository(this) }
+    val mediaStore by lazy { MediaStoreRepository(context!!) }
     private lateinit var photoUri: Uri
 
     private val viewModel: UserInfoViewModel by viewModels()
@@ -48,21 +48,22 @@ class UserInfoActivity : AppCompatActivity() {
     private val cameraLauncher =
         registerForActivityResult(ActivityResultContracts.TakePicture()) { accepted ->
             if (accepted) handleImage(photoUri)
-            else Snackbar.make(findViewById(R.id.takePictureButton), "Échec!", Snackbar.LENGTH_LONG)
+            else Snackbar.make(binding.takePictureButton, "Échec!", Snackbar.LENGTH_LONG)
         }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_user_info)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        val takePictureBtn = findViewById<Button>(R.id.takePictureButton)
-        takePictureBtn.setOnClickListener {
+        binding.takePictureButton.setOnClickListener {
             launchCameraWithPermission()
         }
 
-        val uploadImageBtn = findViewById<Button>(R.id.uploadImageButton)
-        uploadImageBtn.setOnClickListener {
+        binding.uploadImageButton.setOnClickListener {
             galleryLauncher.launch("image/*")
+        }
+
+        binding.confirmButton.setOnClickListener {
+            findNavController().navigate(R.id.action_userInfoFragment_to_taskListFragment)
         }
 
         lifecycleScope.launchWhenStarted {
@@ -79,7 +80,7 @@ class UserInfoActivity : AppCompatActivity() {
 
     private fun launchCameraWithPermission() {
         val camPermission = Manifest.permission.CAMERA
-        val permissionStatus = checkSelfPermission(camPermission)
+        val permissionStatus = checkSelfPermission(context!!, camPermission)
         val isAlreadyAccepted = permissionStatus == PackageManager.PERMISSION_GRANTED
         val isExplanationNeeded = shouldShowRequestPermissionRationale(camPermission)
         when {
@@ -91,7 +92,7 @@ class UserInfoActivity : AppCompatActivity() {
 
     private fun showExplanation() {
         // ici on construit une pop-up système (Dialog) pour expliquer la nécessité de la demande de permission
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(context)
             .setMessage("🥺 On a besoin de la caméra, vraiment! 👉👈")
             .setPositiveButton("Bon, ok") { _, _ -> launchAppSettings() }
             .setNegativeButton("Nope") { dialog, _ -> dialog.dismiss() }
@@ -102,18 +103,17 @@ class UserInfoActivity : AppCompatActivity() {
         // Cet intent permet d'ouvrir les paramètres de l'app (pour modifier les permissions déjà refusées par ex)
         val intent = Intent(
             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-            Uri.fromParts("package", this.packageName, null)
+            Uri.fromParts("package", context?.packageName, null)
         )
         // ici pas besoin de vérifier avant car on vise un écran système:
         startActivity(intent)
     }
 
     private fun handleImage(imageUri: Uri) {
-        val image = findViewById<ImageView>(R.id.avatar)
-        image.load(imageUri)
+        binding.avatar.load(imageUri)
 
         lifecycleScope.launch {
-            viewModel.editAvatar(contentResolver, imageUri)
+            viewModel.editAvatar(context!!.contentResolver, imageUri)
         }
     }
 
@@ -123,6 +123,6 @@ class UserInfoActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        contentResolver.delete(photoUri, null, null)
+        context?.contentResolver?.delete(photoUri, null, null)
     }
 }
