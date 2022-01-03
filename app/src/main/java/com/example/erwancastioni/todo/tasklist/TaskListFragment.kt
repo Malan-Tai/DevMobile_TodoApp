@@ -15,7 +15,6 @@ import coil.transform.CircleCropTransformation
 import com.example.erwancastioni.todo.R
 import com.example.erwancastioni.todo.databinding.FragmentTaskListBinding
 import com.example.erwancastioni.todo.form.FormActivity
-import com.example.erwancastioni.todo.network.Api
 import com.example.erwancastioni.todo.network.TaskListViewModel
 import com.example.erwancastioni.todo.network.UserInfoViewModel
 import com.example.erwancastioni.todo.user.UserInfoActivity
