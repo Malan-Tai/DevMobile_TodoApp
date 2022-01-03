@@ -9,4 +9,9 @@
     <string name="prendre_une_photo">Prendre une photo</string>
     <string name="sign_up">Sign Up</string>
     <string name="log_in">Log In</string>
+    <string name="email_address">E-mail address</string>
+    <string name="password">Password</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="confirm_password">Confirm password</string>
 </resources>
