@@ -16,8 +16,6 @@ import com.example.erwancastioni.todo.network.Api
 import kotlinx.coroutines.launch
 
 class LogInFragment : Fragment() {
-    val SHARED_PREF_TOKEN_KEY = "auth_token_key"
-
     private lateinit var binding: FragmentLogInBinding
     private val userWebService = Api.userWebService
 
@@ -50,7 +48,7 @@ class LogInFragment : Fragment() {
                         val loginResponse = response.body() as LoginResponse
 
                         PreferenceManager.getDefaultSharedPreferences(context).edit {
-                            putString(SHARED_PREF_TOKEN_KEY, loginResponse.token)
+                            putString(Api.SHARED_PREF_TOKEN_KEY, loginResponse.token)
                         }
 
                         findNavController().navigate(R.id.action_logInFragment_to_taskListFragment)
