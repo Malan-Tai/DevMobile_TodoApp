@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.erwancastioni.todo.R
 
-class AnthenticationFragment : Fragment() {
+class AuthenticationFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
