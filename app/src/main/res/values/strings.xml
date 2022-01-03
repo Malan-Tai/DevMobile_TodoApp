@@ -7,4 +7,6 @@
     <string name="edit_task">Edit task</string>
     <string name="choisir_une_image">Choisir une Image</string>
     <string name="prendre_une_photo">Prendre une photo</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="log_in">Log In</string>
 </resources>
