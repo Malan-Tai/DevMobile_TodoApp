@@ -10,7 +10,6 @@ import android.provider.Settings
 import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -29,7 +28,7 @@ import java.util.*
 class UserInfoFragment : Fragment() {
     private lateinit var binding: FragmentUserInfoBinding
 
-    val mediaStore by lazy { MediaStoreRepository(context!!) }
+    val mediaStore by lazy { MediaStoreRepository(requireContext()) }
     private lateinit var photoUri: Uri
 
     private val viewModel: UserInfoViewModel by viewModels()
@@ -80,7 +79,7 @@ class UserInfoFragment : Fragment() {
 
     private fun launchCameraWithPermission() {
         val camPermission = Manifest.permission.CAMERA
-        val permissionStatus = checkSelfPermission(context!!, camPermission)
+        val permissionStatus = activity?.checkSelfPermission(camPermission)
         val isAlreadyAccepted = permissionStatus == PackageManager.PERMISSION_GRANTED
         val isExplanationNeeded = shouldShowRequestPermissionRationale(camPermission)
         when {
@@ -113,7 +112,7 @@ class UserInfoFragment : Fragment() {
         binding.avatar.load(imageUri)
 
         lifecycleScope.launch {
-            viewModel.editAvatar(context!!.contentResolver, imageUri)
+            viewModel.editAvatar(requireContext().contentResolver, imageUri)
         }
     }
 
